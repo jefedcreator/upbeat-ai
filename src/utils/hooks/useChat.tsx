@@ -24,7 +24,9 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
     const initializeChat = () => {
       const systemMessage: ChatCompletionRequestMessage = {
         role: "system",
-        content: "i want you to act as a music therapist. users will tell you how they feel, it is your duty to deduce their emotions and recommend music from it to make them feel better if their emotion is negative or feel good music if the emotion is positive. do not tell me you are an AI language model, just go start to straight to recommending music, no more no less, no extra chitchat, just return a list of the music recommendations",
+        content:
+          // "You will be provided with a description of a person's feeling, and your task is to generate an array of songs that matches the feelings if positive or improves the person's feelings if negative. return your output in an array 'reccomendations'.",
+          "You are to act as a music recommender engine. Users will tell you how they feel and you will simply and precisely just return a list of msuic depending on how the user feels",
       };
       const welcomeMessage: ChatCompletionRequestMessage = {
         role: "assistant",
@@ -38,7 +40,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
     // if (!messages?.length) {
     //   initializeChat();
     // }
-    initializeChat()
+    initializeChat();
   }, []);
   console.log("messages", messages);
 
@@ -75,10 +77,39 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
 
       const reply = data.choices[0].message;
-      // Add the assistant message to the state
-      setMessages((messages) => {
-        return [...messages, reply];
-      });
+
+      // Add the assistant message to the state after processing the response
+      setMessages((messages) => [...messages, reply]);
+      // Split the sentence into individual lines
+      // console.log("reply", reply);
+
+      const lines = reply.content.split("\n");
+
+      console.log("lines", lines);
+
+      // Initialize the recommendations array
+      const recommendations = [];
+
+      // Loop through the lines and extract the song names
+      for (const line of lines) {
+        // Check if the line starts with a number followed by a "."
+        if (/^\d+\.\s*"(.*?)".*$/.test(line)) {
+          // Remove the number and surrounding quotes from the line to get the song name
+          const songName = line.replace(/^\d+\.\s*"(.*?)".*$/, "$1");
+          recommendations.push(songName);
+        }
+      }
+
+      console.log("recommendations", recommendations);
+
+      // const splitReply = reply.split("");
+      // const brackets = ["[", "]"];
+      // if (splitReply.includes(brackets)) {
+      //   const startIndex = reply.indexOf("[");
+      //   const endIndex = reply.lastIndexOf("]");
+      //   const extractedRecommendations = reply.slice(startIndex, endIndex + 1);
+      //   console.log("extractedRecommendations", extractedRecommendations);
+      // }
     } catch (error) {
       // Show error when something goes wrong
       //   addToast({ title: 'An error occurred', type: 'error' })
