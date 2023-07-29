@@ -7,6 +7,7 @@ import {
   ReactNode,
 } from "react";
 import { ChatCompletionRequestMessage } from "openai";
+import { useSession } from "next-auth/react";
 
 interface ContextProps {
   messages: ChatCompletionRequestMessage[];
@@ -14,11 +15,60 @@ interface ContextProps {
   isLoadingAnswer: boolean;
 }
 
+type Reccomendations = {
+  song: string;
+  artist?: string;
+}[];
+
 const ChatsContext = createContext<Partial<ContextProps>>({});
 
 export const Upbeat = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
   const [isLoadingAnswer, setIsLoadingAnswer] = useState(false);
+  const { data: session, status } = useSession() as any;
+
+  const getData = async (song: string, artist: string | null) => {
+    try {
+      const response: any = await Promise.race([
+        // fetch(`https://api.spotify.com/v1/search?q=track:${song}&type=track`, {
+        //   method: "GET",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //     Authorization: `Bearer ${session.accessToken}`,
+        //   },
+        // }),
+        fetch(
+          `https://api.spotify.com/v1/search?q=track:${song}%20${
+            artist && `artist:${artist}`
+          }&type=track`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session.accessToken}`,
+            },
+          }
+        ),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Network Timeout")), 10000)
+        ),
+      ]);
+      const res = await response.json();
+      return res.tracks.items[0].id;
+
+      //   if (res.statusCode === 200) {
+      //     // const { result, count } = res;
+      //     // return {
+      //     //   extrasResult: result,
+      //     //   extrasCount: count,
+      //     // };
+      //   } else {
+      //     console.log(res.message);
+      //   }
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  };
 
   useEffect(() => {
     const initializeChat = () => {
@@ -87,7 +137,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
       console.log("lines", lines);
 
       // Initialize the recommendations array
-      const recommendations = [];
+      const recommendations: Reccomendations = [];
 
       // Loop through the lines and extract the song names and artists
       for (const line of lines) {
@@ -116,12 +166,37 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
             const song = line.replace(/^\d+\.\s*"(.*?)".*$/, "$1");
 
             // Push the song name as an object into the recommendations array
-            recommendations.push({ song });
+            recommendations!.push({ song });
           }
         }
       }
 
       console.log("recommendations", recommendations);
+
+      // Check if the 'recommendations' array is not empty
+      if (recommendations.length > 0) {
+        // Map the 'recommendations' array to create a new array 'songs'
+        // where the 'song' and 'artist' properties have spaces replaced by '%20'
+        const songs = recommendations.map((r) => {
+          return {
+            song: r.song.replace(/ /g, "%20"),
+            artist: r.artist ? r.artist.replace(/ /g, "%20") : null,
+          };
+        });
+
+        // Use Promise.all to handle asynchronous calls to 'getData' for each song
+        const spotifyId = await Promise.all(
+          songs.map((song) => getData(song.song, song.artist))
+        );
+
+        // Log the modified 'songs' array containing encoded song and artist names
+        console.log("songs:", songs);
+
+        // Log the results of the asynchronous 'getData' calls for each song
+        console.log("spotifyIds:", spotifyId);
+      }
+
+      // In the updated code, we check if recommendations is not null directly in the if condition. If it's not null, we proceed with the mapping operation to create an array of song names in uppercase (songs). This change makes the code more concise and efficient.
 
       // const splitReply = reply.split("");
       // const brackets = ["[", "]"];
