@@ -84,19 +84,40 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
       // console.log("reply", reply);
 
       const lines = reply.content.split("\n");
-
       console.log("lines", lines);
 
       // Initialize the recommendations array
       const recommendations = [];
 
-      // Loop through the lines and extract the song names
+      // Loop through the lines and extract the song names and artists
       for (const line of lines) {
         // Check if the line starts with a number followed by a "."
         if (/^\d+\.\s*"(.*?)".*$/.test(line)) {
-          // Remove the number and surrounding quotes from the line to get the song name
-          const songName = line.replace(/^\d+\.\s*"(.*?)".*$/, "$1");
-          recommendations.push(songName);
+          // Check if the line contains "by" to separate song name and artist
+          if (/by/.test(line)) {
+            // Extract the song name and artist from the line
+            const [, song, artist] = line
+              .match(/^\d+\.\s*"(.+?)"\s*by\s*(.+)$/)
+              .map((str: string) => str.trim());
+
+            // Push the song name and artist as an object into the recommendations array
+            recommendations.push({ song, artist });
+          } else if (/-/.test(line)) {
+            // Check if the line contains "-" to separate song name and artist
+            // Extract the song name and artist from the line
+            const [, song, artist] = line
+              .match(/^\d+\.\s*"(.+?)"\s*-\s*(.+)$/)
+              .map((str: string) => str.trim());
+
+            // Push the song name and artist as an object into the recommendations array
+            recommendations.push({ song, artist });
+          } else {
+            // If no "by" or "-" found, assume only the song name is present
+            const song = line.replace(/^\d+\.\s*"(.*?)".*$/, "$1");
+
+            // Push the song name as an object into the recommendations array
+            recommendations.push({ song });
+          }
         }
       }
 
