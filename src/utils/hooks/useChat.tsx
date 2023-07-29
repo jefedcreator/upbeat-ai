@@ -70,6 +70,60 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const getReccomendation = async (tracks: string) => {
+    try {
+      const response: any = await Promise.race([
+        // fetch(`https://api.spotify.com/v1/search?q=track:${song}&type=track`, {
+        //   method: "GET",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //     Authorization: `Bearer ${session.accessToken}`,
+        //   },
+        // }),
+        fetch(
+          `https://api.spotify.com/v1/recommendations?seed_tracks=${tracks}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session.accessToken}`,
+            },
+          }
+        ),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Network Timeout")), 10000)
+        ),
+      ]);
+      const res = await response.json();
+
+      const spotifyTracks = res.tracks.map(
+        (track: any) => track.external_urls.spotify
+      );
+
+      return spotifyTracks;
+
+      //   if (res.statusCode === 200) {
+      //     // const { result, count } = res;
+      //     // return {
+      //     //   extrasResult: result,
+      //     //   extrasCount: count,
+      //     // };
+      //   } else {
+      //     console.log(res.message);
+      //   }
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  };
+
+  function shuffleArray(array: string[]) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
   useEffect(() => {
     const initializeChat = () => {
       const systemMessage: ChatCompletionRequestMessage = {
@@ -185,27 +239,28 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         });
 
         // Use Promise.all to handle asynchronous calls to 'getData' for each song
-        const spotifyId = await Promise.all(
+        const tracks = await Promise.all(
           songs.map((song) => getData(song.song, song.artist))
         );
+
+        const trackIds = tracks.filter((id) => !!id);
+
+        // Function to shuffle the array randomly using Fisher-Yates algorithm
+        const shuffledTracks = shuffleArray(trackIds).slice(0, 3).join(",");
+
+        // Shuffle the array and get the first three elements
 
         // Log the modified 'songs' array containing encoded song and artist names
         console.log("songs:", songs);
 
         // Log the results of the asynchronous 'getData' calls for each song
-        console.log("spotifyIds:", spotifyId);
+        console.log("spotifyIds:", trackIds);
+
+        //Get the tracks from spotify using the gpt generated tracks
+        const spotifyReccomendations = await getReccomendation(shuffledTracks);
+
+        console.log("spotifyReccomendations", spotifyReccomendations);
       }
-
-      // In the updated code, we check if recommendations is not null directly in the if condition. If it's not null, we proceed with the mapping operation to create an array of song names in uppercase (songs). This change makes the code more concise and efficient.
-
-      // const splitReply = reply.split("");
-      // const brackets = ["[", "]"];
-      // if (splitReply.includes(brackets)) {
-      //   const startIndex = reply.indexOf("[");
-      //   const endIndex = reply.lastIndexOf("]");
-      //   const extractedRecommendations = reply.slice(startIndex, endIndex + 1);
-      //   console.log("extractedRecommendations", extractedRecommendations);
-      // }
     } catch (error) {
       // Show error when something goes wrong
       //   addToast({ title: 'An error occurred', type: 'error' })
