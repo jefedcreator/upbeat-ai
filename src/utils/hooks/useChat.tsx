@@ -30,13 +30,6 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
   const getData = async (song: string, artist: string | null) => {
     try {
       const response: any = await Promise.race([
-        // fetch(`https://api.spotify.com/v1/search?q=track:${song}&type=track`, {
-        //   method: "GET",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //     Authorization: `Bearer ${session.accessToken}`,
-        //   },
-        // }),
         fetch(
           `https://api.spotify.com/v1/search?q=track:${song}%20${
             artist && `artist:${artist}`
@@ -55,16 +48,6 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
       ]);
       const res = await response.json();
       return res.tracks.items[0].id;
-
-      //   if (res.statusCode === 200) {
-      //     // const { result, count } = res;
-      //     // return {
-      //     //   extrasResult: result,
-      //     //   extrasCount: count,
-      //     // };
-      //   } else {
-      //     console.log(res.message);
-      //   }
     } catch (error: any) {
       console.log(error.message);
     }
@@ -73,13 +56,6 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
   const getReccomendation = async (tracks: string) => {
     try {
       const response: any = await Promise.race([
-        // fetch(`https://api.spotify.com/v1/search?q=track:${song}&type=track`, {
-        //   method: "GET",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //     Authorization: `Bearer ${session.accessToken}`,
-        //   },
-        // }),
         fetch(
           `https://api.spotify.com/v1/recommendations?seed_tracks=${tracks}`,
           {
@@ -97,20 +73,66 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
       const res = await response.json();
 
       const spotifyTracks = res.tracks.map(
-        (track: any) => track.external_urls.spotify
+        (track: any) => `spotify:track:${track.id}`
       );
 
       return spotifyTracks;
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  };
 
-      //   if (res.statusCode === 200) {
-      //     // const { result, count } = res;
-      //     // return {
-      //     //   extrasResult: result,
-      //     //   extrasCount: count,
-      //     // };
-      //   } else {
-      //     console.log(res.message);
-      //   }
+  const createPlaylist = async () => {
+    try {
+      const response: any = await Promise.race([
+        fetch(`https://api.spotify.com/v1/users/${session.user}/playlists`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.accessToken}`,
+          },
+          body: JSON.stringify({
+            name: "Upbeat Playlist",
+            description: "We hope this playlist makes you feel better 😉",
+            public: false,
+          }),
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Network Timeout")), 10000)
+        ),
+      ]);
+      const res = await response.json();
+
+      return res.id;
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  };
+
+  const updatePlaylist = async (
+    playlistId: string,
+    spotifyTrackIds: string[]
+  ) => {
+    try {
+      const response: any = await Promise.race([
+        fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.accessToken}`,
+          },
+          body: JSON.stringify({
+            uris: spotifyTrackIds,
+            position: 0,
+          }),
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Network Timeout")), 10000)
+        ),
+      ]);
+      const res = await response.json();
+
+      return res;
     } catch (error: any) {
       console.log(error.message);
     }
@@ -257,9 +279,19 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         console.log("spotifyIds:", trackIds);
 
         //Get the tracks from spotify using the gpt generated tracks
-        const spotifyReccomendations = await getReccomendation(shuffledTracks);
+        const spotifyTrackIds = await getReccomendation(shuffledTracks);
 
-        console.log("spotifyReccomendations", spotifyReccomendations);
+        // console.log("spotifyReccomendations", spotifyReccomendations);
+        // Create a new playlist on Spotify
+        const playlistId = await createPlaylist();
+
+        // Update the created playlist with the fetched Spotify track IDs
+        const updatedPlaylist = await updatePlaylist(
+          playlistId,
+          spotifyTrackIds
+        );
+
+        console.log("updatedPlaylist", updatedPlaylist);
       }
     } catch (error) {
       // Show error when something goes wrong
