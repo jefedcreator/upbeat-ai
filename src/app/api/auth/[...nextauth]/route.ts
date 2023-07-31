@@ -1,8 +1,6 @@
 import NextAuth from "next-auth";
 import type { NextAuthOptions } from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
-import JWT from "next-auth/providers/spotify";
-import Account from "next-auth/providers/spotify";
 
 export const authOptions: NextAuthOptions = {
   providers: [

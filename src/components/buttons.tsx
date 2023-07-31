@@ -23,7 +23,7 @@ export const SignInButton = () => {
     );
   }
 
-  return <button onClick={() => signIn()}>Sign In</button>;
+  return <button onClick={() => signIn("spotify")}>Sign In</button>;
 };
 
 export const SignOutButton = () => {
