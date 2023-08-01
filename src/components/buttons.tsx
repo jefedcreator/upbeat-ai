@@ -6,7 +6,6 @@ import Avatar from "./Avatar";
 
 export const SignInButton = () => {
   const { data: session, status } = useSession() as any;
-  console.log(status, session);
 
   if (status === "loading") {
     return <>...</>;
@@ -32,7 +31,7 @@ export const SignInButton = () => {
     return (
       <button
         className="bg-[#1DB954] text-white px-4 py-2"
-        onClick={() => signIn()}
+        onClick={() => signIn("spotify", { callbackUrl: "/chat" })}
       >
         Sign In
       </button>

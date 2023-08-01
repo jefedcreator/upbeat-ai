@@ -1,10 +1,13 @@
 "use client";
 import { useState } from "react";
 import { useChat } from "@/utils/hooks/useChat";
+import { useSession } from "next-auth/react";
 
 const Interaction = () => {
-  const { addMessage, isLoadingAnswer } = useChat();
+  const { addMessage, isLoadingAnswer, messages } = useChat();
   const [interaction, setInteraction] = useState<string>("");
+  const { data: session, status } = useSession() as any;
+
 
   const handleInteraction = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -18,8 +21,13 @@ const Interaction = () => {
   };
 
   return (
-    <section>
+    <section className="text-white">
       <div>Interaction</div>
+      {messages
+        .filter((message) => message.role !== "system")
+        .map((message, index) => (
+          <p key={index}>{message.content}</p>
+        ))}
       {isLoadingAnswer && <p>Loading...</p>}
       <form>
         <div className="mb-6">

@@ -166,7 +166,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
     // if (!messages?.length) {
     //   initializeChat();
     // }
-    // initializeChat();
+    initializeChat();
   }, []);
   console.log("messages", messages);
 
