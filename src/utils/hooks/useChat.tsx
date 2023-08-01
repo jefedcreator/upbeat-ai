@@ -166,7 +166,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
     // if (!messages?.length) {
     //   initializeChat();
     // }
-    initializeChat();
+    // initializeChat();
   }, []);
   console.log("messages", messages);
 
@@ -276,6 +276,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         console.log("songs:", songs);
 
         // Log the results of the asynchronous 'getData' calls for each song
+        console.log("spotifyIds:", trackIds);
 
         //Get the tracks from spotify using the gpt generated tracks
         const spotifyTrackIds = await getReccomendation(shuffledTracks);

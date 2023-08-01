@@ -13,7 +13,7 @@ export const SignInButton = () => {
 
   if (status === "authenticated") {
     return (
-      <div>
+      <div className="flex items-center">
         <Link href={"/"}>
           <p>Welcome {session.user?.name ?? session.name}</p>
           <Image src={""} width={32} height={32} alt="User Avatar" />
@@ -23,7 +23,14 @@ export const SignInButton = () => {
     );
   }
 
-  return <button onClick={() => signIn("spotify")}>Sign In</button>;
+  return (
+    <button
+      className="bg-[#1DB954] text-white px-4 py-2"
+      onClick={() => signIn()}
+    >
+      Sign In
+    </button>
+  );
 };
 
 export const SignOutButton = () => {
