@@ -17,15 +17,15 @@ const page = () => {
             fusion of ChatGPT and Spotify
           </p>
         </div>
-        <Image
+        {/* <Image
           src={
             "https://res.cloudinary.com/hemi/image/upload/v1690849269/ben-blennerhassett-LR5eS1C9IUU-unsplash_yoarqv.png"
           }
+          height={1000}
+          width={1000}
           alt="Banner Image"
-          width={100}
-          height={100}
-          className="w-1/2 h-full"
-        />
+          className="w-1/2 h-full object-contain"
+        /> */}
       </section>
       {/* <Upbeat>
         <Interaction />
