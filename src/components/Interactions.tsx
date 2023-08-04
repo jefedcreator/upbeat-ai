@@ -44,7 +44,6 @@ const Interaction = () => {
 
   return (
     <section className="text-white relative md:h-[85%] h-[80%]">
-      {playlist && <Confetti width={width} height={height} />}
       <div className="h-[10%] flex flex-col items-center justify-center">
         <h2 className="text-center font-bold text-2xl">Interaction</h2>
       </div>
@@ -90,7 +89,7 @@ const Interaction = () => {
               height={100}
               className="w-full h-1/2 object-contain"
             />
-            <div className="md:w-[50%] w-[80%] mx-auto h-1/2 flex flex-col justify-start gap-2 item-center overflow-auto scrollbar-hidden">
+            <div className="md:w-[50%] w-[80%] mx-auto h-[40%] flex flex-col justify-start gap-2 item-center overflow-auto scrollbar-hidden">
               {playlist.tracks.map((track: any, index) => (
                 <div className="flex item-center gap-2" key={index}>
                   <Image
@@ -126,6 +125,7 @@ const Interaction = () => {
               <BsBoxArrowUpRight />
             </Link>
           </span>
+          <Confetti width={width} height={height} />
         </div>
       )}
     </section>
