@@ -1,29 +1,28 @@
 "use client";
 import { useSession, signIn, signOut } from "next-auth/react";
-import Link from "next/link";
-import Image from "next/image";
 import Avatar from "./Avatar";
+import Loader from "./Loader";
 
 export const SignInButton = () => {
   const { data: session, status } = useSession() as any;
 
   if (status === "loading") {
-    return <>...</>;
+    return <Loader />;
   }
 
   if (status === "authenticated") {
     return (
       <div className="flex items-center gap-2 text-white">
-        <p>Welcome {session.user?.name ?? session.name}</p>
-        {/* <Image src={""} width={32} height={32} alt="User Avatar" /> */}
+        <p>Welcome, {session.user?.name ?? session.name}</p>
         <Avatar />
         <button
-          className="bg-[#1DB954] text-white px-4 py-2"
+          className="bg-[#1DB954] text-white md:px-4 md:py-2 px-2 py-1"
           onClick={() => signOut()}
         >
           Sign Out
         </button>
       </div>
+      // <Loader/>
     );
   }
 

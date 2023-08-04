@@ -11,6 +11,18 @@ const nextConfig = {
         port: "",
         pathname: "/hemi/**",
       },
+      {
+        protocol: "https",
+        hostname: "mosaic.scdn.co",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "i.scdn.co",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };

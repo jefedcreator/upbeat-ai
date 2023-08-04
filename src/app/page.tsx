@@ -2,8 +2,8 @@ import Image from "next/image";
 
 const page = () => {
   return (
-    <section className="h-[90%] flex justify-between items-start text-white">
-      <div className="w-1/2">
+    <section className="h-[90%] flex md:flex-row flex-col-reverse md:justify-between justify-end gap-3 items-start text-white">
+      <div className="md:w-1/2 w-full">
         <h1 className="text-4xl font-extrabold">Upbeat AI </h1>
         <p>
           Unleash personalized playlists based on your mood. Experience the
@@ -17,7 +17,7 @@ const page = () => {
         height={1000}
         width={1000}
         alt="Banner Image"
-        className="w-1/2 h-full object-contain"
+        className="md:w-1/2 w-full md:h-[80%] h-1/2 object-cover"
       />
     </section>
   );

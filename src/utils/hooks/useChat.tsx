@@ -8,11 +8,15 @@ import {
 } from "react";
 import { ChatCompletionRequestMessage } from "openai";
 import { useSession } from "next-auth/react";
+import { toast } from "react-toastify";
 
 interface ContextProps {
   messages: ChatCompletionRequestMessage[];
   addMessage: (content: string) => Promise<void>;
   isLoadingAnswer: boolean;
+  playlist: Playlist | null;
+  setReset: React.Dispatch<React.SetStateAction<boolean>>;
+  setPlaylist: React.Dispatch<React.SetStateAction<Playlist | null>>;
 }
 
 type Reccomendations = {
@@ -20,12 +24,28 @@ type Reccomendations = {
   artist?: string;
 }[];
 
+type Track = {
+  name: string;
+  image: string;
+  artist: string;
+};
+
+type Playlist = {
+  name: string;
+  description: string;
+  url: string;
+  image: string;
+  tracks: Track[];
+};
+
 const ChatsContext = createContext<Partial<ContextProps>>({});
 
 export const Upbeat = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
   const [isLoadingAnswer, setIsLoadingAnswer] = useState(false);
   const { data: session, status } = useSession() as any;
+  const [playlist, setPlaylist] = useState<Playlist | null>(null);
+  const [reset, setReset] = useState(false);
 
   const getData = async (song: string, artist: string | null) => {
     try {
@@ -47,9 +67,51 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         ),
       ]);
       const res = await response.json();
-      return res.tracks.items[0].id;
+      console.log("track res:", res.tracks.items[0].id ?? null);
+      const id = res.tracks?.items[0]?.id ?? null;
+      return id;
     } catch (error: any) {
-      console.log(error.message);
+      throw new Error(error.message);
+    }
+  };
+
+  const getPlaylistData = async (playlistId: string) => {
+    try {
+      const response: any = await Promise.race([
+        fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.accessToken}`,
+          },
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Network Timeout")), 10000)
+        ),
+      ]);
+      const res = await response.json();
+      console.log("playlist:", res);
+
+      const { name, description, external_urls, images, tracks: songs } = res;
+      const tracks = songs.items.map((song: any) => {
+        return {
+          name: song.track.name,
+          artist: song.track.artists[0].name,
+          image: song.track.album.images[1].url,
+        };
+      });
+
+      console.log("tracks", tracks);
+
+      return {
+        name,
+        description,
+        url: external_urls.spotify,
+        image: images[1].url,
+        tracks,
+      };
+    } catch (error: any) {
+      throw new Error(error.message);
     }
   };
 
@@ -78,7 +140,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
 
       return spotifyTracks;
     } catch (error: any) {
-      console.log(error.message);
+      throw new Error(error.message);
     }
   };
 
@@ -105,7 +167,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
 
       return res.id;
     } catch (error: any) {
-      console.log(error.message);
+      throw new Error(error.message);
     }
   };
 
@@ -134,7 +196,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
 
       return res;
     } catch (error: any) {
-      console.log(error.message);
+      throw new Error(error.message);
     }
   };
 
@@ -167,7 +229,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
     //   initializeChat();
     // }
     initializeChat();
-  }, []);
+  }, [reset]);
   console.log("messages", messages);
 
   const addMessage = async (content: string) => {
@@ -204,8 +266,6 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
 
       const reply = data.choices[0].message;
 
-      // Add the assistant message to the state after processing the response
-      setMessages((messages) => [...messages, reply]);
       // Split the sentence into individual lines
       // console.log("reply", reply);
 
@@ -214,16 +274,18 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
 
       // Initialize the recommendations array
       const recommendations: Reccomendations = [];
+      let containsNumericalList = false;
 
       // Loop through the lines and extract the song names and artists
       for (const line of lines) {
         // Check if the line starts with a number followed by a "."
         if (/^\d+\.\s*"(.*?)".*$/.test(line)) {
+          containsNumericalList = true;
           // Check if the line contains "by" to separate song name and artist
           if (/by/.test(line)) {
             // Extract the song name and artist from the line
             const [, song, artist] = line
-              .match(/^\d+\.\s*"(.+?)"\s*by\s*(.+)$/)
+              .match(/^\d+\.\s*"(.+?)"\s*by\s*(.+)$/)!
               .map((str: string) => str.trim());
 
             // Push the song name and artist as an object into the recommendations array
@@ -232,7 +294,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
             // Check if the line contains "-" to separate song name and artist
             // Extract the song name and artist from the line
             const [, song, artist] = line
-              .match(/^\d+\.\s*"(.+?)"\s*-\s*(.+)$/)
+              .match(/^\d+\.\s*"(.+?)"\s*-\s*(.+)$/)!
               .map((str: string) => str.trim());
 
             // Push the song name and artist as an object into the recommendations array
@@ -242,9 +304,14 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
             const song = line.replace(/^\d+\.\s*"(.*?)".*$/, "$1");
 
             // Push the song name as an object into the recommendations array
-            recommendations!.push({ song });
+            recommendations.push({ song });
           }
         }
+      }
+
+      // If the reply does not contain a numerical list, add the recommendations to the state
+      if (!containsNumericalList) {
+        setMessages((messages) => [...messages, reply]);
       }
 
       console.log("recommendations", recommendations);
@@ -260,23 +327,25 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
           };
         });
 
+        // Log the modified 'songs' array containing encoded song and artist names
+        console.log("songs:", songs);
+
         // Use Promise.all to handle asynchronous calls to 'getData' for each song
         const tracks = await Promise.all(
           songs.map((song) => getData(song.song, song.artist))
         );
 
+        console.log("tracks", tracks);
+
         const trackIds = tracks.filter((id) => !!id);
+
+        // Log the results of the asynchronous 'getData' calls for each song
+        console.log("spotifyIds:", trackIds);
 
         // Function to shuffle the array randomly using Fisher-Yates algorithm
         const shuffledTracks = shuffleArray(trackIds).slice(0, 3).join(",");
 
         // Shuffle the array and get the first three elements
-
-        // Log the modified 'songs' array containing encoded song and artist names
-        console.log("songs:", songs);
-
-        // Log the results of the asynchronous 'getData' calls for each song
-        console.log("spotifyIds:", trackIds);
 
         //Get the tracks from spotify using the gpt generated tracks
         const spotifyTrackIds = await getReccomendation(shuffledTracks);
@@ -292,8 +361,15 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         );
 
         console.log("updatedPlaylist", updatedPlaylist);
+
+        const playlistData = await getPlaylistData(playlistId);
+
+        // lof
+
+        setPlaylist(playlistData);
       }
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error.message);
       // Show error when something goes wrong
       //   addToast({ title: 'An error occurred', type: 'error' })
     } finally {
@@ -302,7 +378,16 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <ChatsContext.Provider value={{ addMessage, messages, isLoadingAnswer }}>
+    <ChatsContext.Provider
+      value={{
+        addMessage,
+        messages,
+        isLoadingAnswer,
+        playlist,
+        setReset,
+        setPlaylist,
+      }}
+    >
       {children}
     </ChatsContext.Provider>
   );
