@@ -1,5 +1,5 @@
 import { Upbeat } from "@/utils/hooks/useChat";
-import Interaction from "@/components/interaction";
+import Interaction from "@/components/Interaction";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
