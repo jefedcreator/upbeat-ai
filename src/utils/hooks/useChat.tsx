@@ -180,8 +180,6 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
 
         const playlistData = await getPlaylistData(playlistId, session);
 
-        // lof
-
         setPlaylist(playlistData);
       }
     } catch (error: any) {
