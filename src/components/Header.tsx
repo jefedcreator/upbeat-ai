@@ -1,4 +1,4 @@
-import { SignInButton } from "@/components/Buttons";
+import { SignInButton } from "@/components/Button";
 import Link from "next/link";
 
 const Header = () => {
