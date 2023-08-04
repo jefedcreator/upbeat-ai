@@ -8,6 +8,12 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
   title: "Upbeat",
   description: "Upbeat AI",
+  viewport: {
+    width: "device-width",
+    initialScale: 1.0,
+    maximumScale: 1.0,
+    userScalable: false,
+  },
 };
 
 export default function RootLayout({

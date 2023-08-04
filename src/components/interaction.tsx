@@ -30,6 +30,7 @@ const Interaction = () => {
     try {
       await addMessage(interaction);
     } catch (error: any) {
+      console.log(error.message);
       toast.error(error.message);
     } finally {
       setInteraction("");
@@ -78,7 +79,7 @@ const Interaction = () => {
         </button>
       </form>
       {playlist && (
-        <div className="md:w-[40%] w-[80%] h-[70%] md:h-[80%] fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black flex flex-col items-center justify-start gap-2 text-center p-5">
+        <div className="md:w-[40%] w-[85%] h-[90%] md:h-[80%] fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black flex flex-col items-center justify-start gap-2 text-center p-5">
           <p>{playlist.name}</p>
           <p>{playlist.description}</p>
           <div className="min-h-[80%] md:min-h-[75%] w-full">
@@ -127,7 +128,6 @@ const Interaction = () => {
           </span>
         </div>
       )}
-
     </section>
   );
 };
