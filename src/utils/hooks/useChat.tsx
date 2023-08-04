@@ -9,34 +9,15 @@ import {
 import { ChatCompletionRequestMessage } from "openai";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
-
-interface ContextProps {
-  messages: ChatCompletionRequestMessage[];
-  addMessage: (content: string) => Promise<void>;
-  isLoadingAnswer: boolean;
-  playlist: Playlist | null;
-  setReset: React.Dispatch<React.SetStateAction<boolean>>;
-  setPlaylist: React.Dispatch<React.SetStateAction<Playlist | null>>;
-}
-
-type Reccomendations = {
-  song: string;
-  artist?: string;
-}[];
-
-type Track = {
-  name: string;
-  image: string;
-  artist: string;
-};
-
-type Playlist = {
-  name: string;
-  description: string;
-  url: string;
-  image: string;
-  tracks: Track[];
-};
+import { ContextProps, Reccomendations, Playlist } from "../types";
+import {
+  getData,
+  getPlaylistData,
+  getReccomendation,
+  createPlaylist,
+  updatePlaylist,
+  shuffleArray,
+} from "../helpers";
 
 const ChatsContext = createContext<Partial<ContextProps>>({});
 
@@ -46,166 +27,6 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
   const { data: session, status } = useSession() as any;
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [reset, setReset] = useState(false);
-
-  const getData = async (song: string, artist: string | null) => {
-    try {
-      const response: any = await Promise.race([
-        fetch(
-          `https://api.spotify.com/v1/search?q=track:${song}%20${
-            artist && `artist:${artist}`
-          }&type=track`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${session.accessToken}`,
-            },
-          }
-        ),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Network Timeout")), 10000)
-        ),
-      ]);
-      const res = await response.json();
-      // console.log("track res:", res.tracks.items[0].id ?? null);
-      const id = res.tracks?.items[0]?.id ?? null;
-      return id;
-    } catch (error: any) {
-      throw new Error(error.message);
-    }
-  };
-
-  const getPlaylistData = async (playlistId: string) => {
-    try {
-      const response: any = await Promise.race([
-        fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.accessToken}`,
-          },
-        }),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Network Timeout")), 10000)
-        ),
-      ]);
-      const res = await response.json();
-
-      const { name, description, external_urls, images, tracks: songs } = res;
-      const tracks = songs.items.map((song: any) => {
-        return {
-          name: song.track.name,
-          artist: song.track.artists[0].name,
-          image: song.track.album.images[1].url,
-        };
-      });
-
-      console.log("tracks", tracks);
-
-      return {
-        name,
-        description,
-        url: external_urls.spotify,
-        image: images[1].url,
-        tracks,
-      };
-    } catch (error: any) {
-      throw new Error(error.message);
-    }
-  };
-
-  const getReccomendation = async (tracks: string) => {
-    try {
-      const response: any = await Promise.race([
-        fetch(
-          `https://api.spotify.com/v1/recommendations?seed_tracks=${tracks}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${session.accessToken}`,
-            },
-          }
-        ),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Network Timeout")), 10000)
-        ),
-      ]);
-      const res = await response.json();
-
-      const spotifyTracks = res.tracks.map(
-        (track: any) => `spotify:track:${track.id}`
-      );
-
-      return spotifyTracks;
-    } catch (error: any) {
-      throw new Error(error.message);
-    }
-  };
-
-  const createPlaylist = async () => {
-    try {
-      const response: any = await Promise.race([
-        fetch(`https://api.spotify.com/v1/users/${session.user}/playlists`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.accessToken}`,
-          },
-          body: JSON.stringify({
-            name: "Upbeat Playlist",
-            description: "We hope this playlist makes you feel better 😉",
-            public: false,
-          }),
-        }),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Network Timeout")), 10000)
-        ),
-      ]);
-      const res = await response.json();
-
-      return res.id;
-    } catch (error: any) {
-      throw new Error(error.message);
-    }
-  };
-
-  const updatePlaylist = async (
-    playlistId: string,
-    spotifyTrackIds: string[]
-  ) => {
-    try {
-      const response: any = await Promise.race([
-        fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.accessToken}`,
-          },
-          body: JSON.stringify({
-            uris: spotifyTrackIds,
-            position: 0,
-          }),
-        }),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Network Timeout")), 10000)
-        ),
-      ]);
-      const res = await response.json();
-
-      return res;
-    } catch (error: any) {
-      throw new Error(error.message);
-    }
-  };
-
-  function shuffleArray(array: string[]) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  }
 
   useEffect(() => {
     const initializeChat = () => {
@@ -327,7 +148,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
 
         // Use Promise.all to handle asynchronous calls to 'getData' for each song
         const tracks = await Promise.all(
-          songs.map((song) => getData(song.song, song.artist))
+          songs.map((song) => getData(song.song, song.artist, session))
         );
 
         // console.log("tracks", tracks);
@@ -343,30 +164,29 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         // Shuffle the array and get the first three elements
 
         //Get the tracks from spotify using the gpt generated tracks
-        const spotifyTrackIds = await getReccomendation(shuffledTracks);
+        const spotifyTrackIds = await getReccomendation(
+          shuffledTracks,
+          session
+        );
 
         // console.log("spotifyReccomendations", spotifyReccomendations);
         // Create a new playlist on Spotify
-        const playlistId = await createPlaylist();
+        const playlistId = await createPlaylist(session);
 
         // Update the created playlist with the fetched Spotify track IDs
-        const updatedPlaylist = await updatePlaylist(
-          playlistId,
-          spotifyTrackIds
-        );
+        await updatePlaylist(playlistId, spotifyTrackIds, session);
 
-        console.log("updatedPlaylist", updatedPlaylist);
+        // console.log("updatedPlaylist", updatedPlaylist);
 
-        const playlistData = await getPlaylistData(playlistId);
+        const playlistData = await getPlaylistData(playlistId, session);
 
         // lof
 
         setPlaylist(playlistData);
       }
     } catch (error: any) {
-      toast.error(error.message);
       // Show error when something goes wrong
-      //   addToast({ title: 'An error occurred', type: 'error' })
+      toast.error(error.message);
     } finally {
       setIsLoadingAnswer(false);
     }
