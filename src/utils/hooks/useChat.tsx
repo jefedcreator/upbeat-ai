@@ -67,7 +67,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         ),
       ]);
       const res = await response.json();
-      console.log("track res:", res.tracks.items[0].id ?? null);
+      // console.log("track res:", res.tracks.items[0].id ?? null);
       const id = res.tracks?.items[0]?.id ?? null;
       return id;
     } catch (error: any) {
@@ -90,7 +90,6 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         ),
       ]);
       const res = await response.json();
-      console.log("playlist:", res);
 
       const { name, description, external_urls, images, tracks: songs } = res;
       const tracks = songs.items.map((song: any) => {
@@ -230,7 +229,6 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
     // }
     initializeChat();
   }, [reset]);
-  console.log("messages", messages);
 
   const addMessage = async (content: string) => {
     setIsLoadingAnswer(true);
@@ -270,7 +268,6 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
       // console.log("reply", reply);
 
       const lines = reply.content.split("\n");
-      console.log("lines", lines);
 
       // Initialize the recommendations array
       const recommendations: Reccomendations = [];
@@ -314,8 +311,6 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         setMessages((messages) => [...messages, reply]);
       }
 
-      console.log("recommendations", recommendations);
-
       // Check if the 'recommendations' array is not empty
       if (recommendations.length > 0) {
         // Map the 'recommendations' array to create a new array 'songs'
@@ -328,19 +323,19 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         });
 
         // Log the modified 'songs' array containing encoded song and artist names
-        console.log("songs:", songs);
+        // console.log("songs:", songs);
 
         // Use Promise.all to handle asynchronous calls to 'getData' for each song
         const tracks = await Promise.all(
           songs.map((song) => getData(song.song, song.artist))
         );
 
-        console.log("tracks", tracks);
+        // console.log("tracks", tracks);
 
         const trackIds = tracks.filter((id) => !!id);
 
         // Log the results of the asynchronous 'getData' calls for each song
-        console.log("spotifyIds:", trackIds);
+        // console.log("spotifyIds:", trackIds);
 
         // Function to shuffle the array randomly using Fisher-Yates algorithm
         const shuffledTracks = shuffleArray(trackIds).slice(0, 3).join(",");

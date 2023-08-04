@@ -30,7 +30,6 @@ const Interaction = () => {
     try {
       await addMessage(interaction);
     } catch (error: any) {
-      console.log(error.message);
       toast.error(error.message);
     } finally {
       setInteraction("");
