@@ -108,7 +108,7 @@ const Interaction = () => {
               ))}
             </div>
           </div>
-          <span className="flex items-center justify-around w-full">
+          <span className="flex items-center h-[10%] justify-around w-full">
             <div
               className="flex cursor-pointer items-center justify-center gap-1 text-[#1DB954] bg-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-[40%] sm:w-auto px-5 py-2.5 text-center"
               onClick={handleRedo}
