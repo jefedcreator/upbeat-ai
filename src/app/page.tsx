@@ -2,7 +2,7 @@ import Image from "next/image";
 
 const page = () => {
   return (
-    <section className="h-[90%] flex md:flex-row flex-col-reverse md:justify-between justify-end gap-3 items-start text-white">
+    <section className="h-[80%] flex md:flex-row flex-col-reverse md:justify-between justify-end gap-3 items-start text-white">
       <div className="md:w-1/2 w-full">
         <h1 className="text-4xl font-extrabold">Upbeat AI </h1>
         <p>

@@ -43,12 +43,12 @@ const Interaction = () => {
   };
 
   return (
-    <section className="text-white relative md:h-[85%] h-[90%]">
+    <section className="text-white relative md:h-[85%] h-[80%]">
       {playlist && <Confetti width={width} height={height} />}
       <div className="h-[10%] flex flex-col items-center justify-center">
         <h2 className="text-center font-bold text-2xl">Interaction</h2>
       </div>
-      <div className="md:min-h-[70%] min-h-[80%] flex flex-col gap-2">
+      <div className="md:min-h-[70%] min-h-[75%] flex flex-col gap-2">
         {messages
           .filter((message) => message.role !== "system")
           .map((message, index) => (
