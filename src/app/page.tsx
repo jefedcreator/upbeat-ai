@@ -5,14 +5,14 @@ import Link from "next/link";
 const page = () => {
   return (
     <section className="h-[80%] flex md:flex-row flex-col-reverse md:justify-between justify-end gap-3 items-start text-white">
-      <div className="flex flex-col gap-3 md:w-1/2 w-full">
+      <div className="flex flex-col gap-3 md:w-1/2 w-full md:h-[50%]">
         <h1 className="text-4xl font-extrabold">Upbeat AI </h1>
         <p>
           Unleash personalized playlists based on your mood. Experience the
           fusion of ChatGPT and Spotify
         </p>
         <Link
-          className="flex cursor-pointer items-center justify-center gap-1 text-white bg-[#1DB954] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-[40%] sm:w-auto px-5 py-2.5 text-center"
+          className="flex cursor-pointer items-center justify-center gap-1 text-white bg-[#1DB954] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-[40%] px-5 py-2.5 text-center md:mt-auto mt-0"
           href="/chat"
         >
           Open
