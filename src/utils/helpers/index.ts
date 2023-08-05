@@ -51,7 +51,7 @@ export const getPlaylistData = async (playlistId: string, session: any) => {
       return {
         name: song.track.name,
         artist: song.track.artists[0].name,
-        image: song.track.album.images[1].url,
+        image: song.track.album.images[2].url,
       };
     });
 

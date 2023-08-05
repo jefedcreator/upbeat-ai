@@ -144,24 +144,23 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         });
 
         // Log the modified 'songs' array containing encoded song and artist names
-        // console.log("songs:", songs);
+        console.log("songs:", songs);
 
         // Use Promise.all to handle asynchronous calls to 'getData' for each song
         const tracks = await Promise.all(
           songs.map((song) => getData(song.song, song.artist, session))
         );
 
-        // console.log("tracks", tracks);
+        console.log("tracks", tracks);
 
         const trackIds = tracks.filter((id) => !!id);
 
         // Log the results of the asynchronous 'getData' calls for each song
-        // console.log("spotifyIds:", trackIds);
+        console.log("spotifyIds:", trackIds);
 
         // Function to shuffle the array randomly using Fisher-Yates algorithm
-        const shuffledTracks = shuffleArray(trackIds).slice(0, 3).join(",");
-
         // Shuffle the array and get the first three elements
+        const shuffledTracks = shuffleArray(trackIds).slice(0, 3).join(",");
 
         //Get the tracks from spotify using the gpt generated tracks
         const spotifyTrackIds = await getReccomendation(
@@ -169,14 +168,13 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
           session
         );
 
-        // console.log("spotifyReccomendations", spotifyReccomendations);
         // Create a new playlist on Spotify
         const playlistId = await createPlaylist(session);
 
+        console.log("playlistId:", playlistId);
+
         // Update the created playlist with the fetched Spotify track IDs
         await updatePlaylist(playlistId, spotifyTrackIds, session);
-
-        // console.log("updatedPlaylist", updatedPlaylist);
 
         const playlistData = await getPlaylistData(playlistId, session);
 

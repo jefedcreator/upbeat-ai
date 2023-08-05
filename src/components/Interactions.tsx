@@ -38,7 +38,7 @@ const Interaction = () => {
   };
 
   const handleRedo = () => {
-    setReset(true);
+    setReset((reset) => !reset);
     setPlaylist(null);
   };
 
@@ -79,7 +79,7 @@ const Interaction = () => {
       </form>
       {playlist && (
         <div className="md:w-[40%] w-[85%] h-[90%] md:h-[80%] fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black flex flex-col items-center justify-start md:gap-2 gap-1 text-center p-5">
-          <p>{playlist.name}</p>
+          <p className="text-lg">{playlist.name}</p>
           <p>{playlist.description}</p>
           <div className="md:min-h-[75%] min-h-[80%] w-full">
             <Image
@@ -87,7 +87,7 @@ const Interaction = () => {
               alt={playlist.name}
               width={100}
               height={100}
-              className="w-full h-1/2 object-cover"
+              className="w-full h-1/2 object-contain"
             />
             <div className="md:w-[50%] w-[80%] mx-auto h-[40%] flex flex-col justify-start gap-2 item-center overflow-auto scrollbar-hidden">
               {playlist.tracks.map((track: any, index) => (
