@@ -55,8 +55,6 @@ export const getPlaylistData = async (playlistId: string, session: any) => {
       };
     });
 
-    console.log("tracks", tracks);
-
     return {
       name,
       description,
