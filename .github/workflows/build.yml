@@ -5,4 +5,28 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Run npm install and build
+        run: |
+          npm cache clear --force
+          npm i --force
+          npm ci --force
+          npm run build
+        env:
+          CI: false
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: build
+          retention-days: 1
+  
+
+
 
