@@ -6,6 +6,10 @@ import Loader from "./Loader";
 export const SignInButton = () => {
   const { data: session, status } = useSession() as any;
 
+  console.log("session", session);
+  console.log("status", status);
+  
+
   if (status === "loading") {
     return <Loader />;
   }

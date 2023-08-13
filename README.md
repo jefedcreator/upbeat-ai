@@ -1,7 +1,6 @@
 <h1>Upbeat AI</h1>
 Unleash personalized playlists based on your mood. Experience the fusion of ChatGPT and Spotify
 
-
 ## Table of Contents
 
 [Introduction](#Introduction)
@@ -22,11 +21,11 @@ Experience a harmonious blend of emotions and music with Upbeat. Imagine a dynam
 
 **Key Features:**
 
-* Personalized Mood Playlists: Let Upbeat curate playlists that mirror your emotions. From joy to introspection, each playlist is finely tuned to enhance your mood.
+- Personalized Mood Playlists: Let Upbeat curate playlists that mirror your emotions. From joy to introspection, each playlist is finely tuned to enhance your mood.
 
-* Seamless Integration: Effortlessly connect your Spotify account and let Upbeat enhance your existing library. No more searching – let Upbeat's AI recommendations do the work.
+- Seamless Integration: Effortlessly connect your Spotify account and let Upbeat enhance your existing library. No more searching – let Upbeat's AI recommendations do the work.
 
-* Global Musical Exploration: Discover the world's melodies through Upbeat's AI-powered recommendations. Explore diverse genres and cultures, all tailored to your emotional state.
+- Global Musical Exploration: Discover the world's melodies through Upbeat's AI-powered recommendations. Explore diverse genres and cultures, all tailored to your emotional state.
 
 ### Entity Relationship Diagram
 
@@ -680,3 +679,25 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 ## Live App
 
 <b>[Upbeat](https://upbeatai.vercel.app/)
+
+### Demo
+
+<b>[Youtube](https://youtu.be/DNfqiqtwrzM)
+
+#### Prompts
+
+Try the follwing propmts to generate a playlist
+
+```text
+. I am feeling happy
+. I am feeling sad
+. I am feeling angry
+. I am feeling like listening to some afrobeats
+. I am feeling like listening to some rnb
+```
+
+When interacting with the bot, go straight to the
+point, one sentence is enough. it's not the smartest
+ai but it understands context, so it may ask you
+for clarification or return what you just said. no
+worries, just repeat yourself again

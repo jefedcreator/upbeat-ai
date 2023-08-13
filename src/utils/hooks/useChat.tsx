@@ -86,7 +86,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
       const reply = data.choices[0].message;
 
       // Split the sentence into individual lines
-      // console.log("reply", reply);
+      console.log("reply", reply);
 
       const lines = reply.content.split("\n");
 
@@ -183,6 +183,17 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
     } catch (error: any) {
       // Show error when something goes wrong
       toast.error(error.message);
+      const systemMessage: ChatCompletionRequestMessage = {
+        role: "system",
+        content:
+          // "You will be provided with a description of a person's feeling, and your task is to generate an array of songs that matches the feelings if positive or improves the person's feelings if negative. return your output in an array 'reccomendations'.",
+          "You are to act as a music recommender engine. Users will tell you how they feel and you will simply and precisely just return a list of msuic depending on how the user feels",
+      };
+      const errorMessage: ChatCompletionRequestMessage = {
+        role: "assistant",
+        content: `I didn't quite get that, please be more specific with your mood e.g "i feel happy"`,
+      };
+      setMessages([systemMessage, errorMessage]);
     } finally {
       setIsLoadingAnswer(false);
     }

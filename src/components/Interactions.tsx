@@ -91,14 +91,14 @@ const Interaction = () => {
             />
             <div className="md:w-[50%] w-[80%] mx-auto h-[40%] flex flex-col justify-start gap-2 item-center overflow-auto scrollbar-hidden">
               {playlist.tracks.map((track: any, index) => (
-                <div className="flex item-center gap-2" key={index}>
+                <div className="flex item-center gap-2 max-h-[50%]" key={index}>
                   <Image
                     src={track.image}
                     alt={track.name}
                     width={35}
                     height={25}
                   />
-                  <span className="flex flex-col text-left">
+                  <span className="flex flex-col text-left overflow-hidden">
                     <p>{track.name}</p>
                     <p className="text-sm text-gray-500 font-light">
                       {track.artist}
