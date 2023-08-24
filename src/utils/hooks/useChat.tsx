@@ -68,7 +68,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
 
       const body = JSON.stringify({
         messages,
-        model: "gpt-3.5-turbo",
+        model: "gpt-4",
         stream: false,
       });
 
