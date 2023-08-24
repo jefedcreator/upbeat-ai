@@ -97,6 +97,7 @@ const Interaction = () => {
                     alt={track.name}
                     width={35}
                     height={25}
+                    className="w-auto h-auto"
                   />
                   <span className="flex flex-col text-left overflow-hidden">
                     <p>{track.name}</p>

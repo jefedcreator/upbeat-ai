@@ -34,7 +34,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         role: "system",
         content:
           // "You will be provided with a description of a person's feeling, and your task is to generate an array of songs that matches the feelings if positive or improves the person's feelings if negative. return your output in an array 'reccomendations'.",
-          "You are to act as a music recommender engine. Users will tell you how they feel and you will simply and precisely just return a list of msuic depending on how the user feels",
+          "As a music recommender, Users will tell you what they want to listen to. you will understand the user preference and you will simply and precisely just return a list of music that exactly suits the user preference. ask the user for clarity if you do not understand",
       };
       const welcomeMessage: ChatCompletionRequestMessage = {
         role: "assistant",
@@ -90,6 +90,8 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
 
       const lines = reply.content.split("\n");
 
+      console.log("lines", lines);
+
       // Initialize the recommendations array
       const recommendations: Reccomendations = [];
       let containsNumericalList = false;
@@ -97,11 +99,12 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
       // Loop through the lines and extract the song names and artists
       for (const line of lines) {
         // Check if the line starts with a number followed by a "."
-        if (/^\d+\.\s*"(.*?)".*$/.test(line)) {
+        if (/^\d+\.\s*(.*?)\s*(?:by|-)?\s*(.*)$/.test(line)) {
           containsNumericalList = true;
           // Check if the line contains "by" to separate song name and artist
           if (/by/.test(line)) {
             // Extract the song name and artist from the line
+
             const [, song, artist] = line
               .match(/^\d+\.\s*"(.+?)"\s*by\s*(.+)$/)!
               .map((str: string) => str.trim());
@@ -127,6 +130,22 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         }
       }
 
+      // for (const line of lines) {
+      //   // Check if the line starts with a number followed by a "."
+      //   if (/^\d+\.\s*(.*?)\s*(?:by|-)?\s*(.*)$/.test(line)) {
+      //     containsNumericalList = true;
+      //     // Extract the song name and artist from the line
+      //     console.log("song line", line);
+
+      //     const [idk, song] = line
+      //       .match(/^\d+\.\s*(.*?)\s*(?:by|-)?\s*(.*)$/)!
+      //       .map((str: string) => str.trim());
+      //     console.log("idk", idk, "song", song);
+
+      //     // Push the song name and artist as an object into the recommendations array
+      //     // recommendations.push({ song });
+      //   }
+      // }
       // If the reply does not contain a numerical list, add the recommendations to the state
       if (!containsNumericalList) {
         setMessages((messages) => [...messages, reply]);
@@ -187,7 +206,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         role: "system",
         content:
           // "You will be provided with a description of a person's feeling, and your task is to generate an array of songs that matches the feelings if positive or improves the person's feelings if negative. return your output in an array 'reccomendations'.",
-          "You are to act as a music recommender engine. Users will tell you how they feel and you will simply and precisely just return a list of msuic depending on how the user feels",
+          "You are a music recommender engine. Users will tell you how they feel emotionally,or the genre of music they want to listen to, or the artiste they want to listen to. you will understand the user current preferences and you will simply and precisely just return a list of music that exactly suits the user preference. ask the user for clarity if you do not understand their preference",
       };
       const errorMessage: ChatCompletionRequestMessage = {
         role: "assistant",
