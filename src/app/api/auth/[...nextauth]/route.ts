@@ -38,7 +38,7 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID!,
       clientSecret: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET!,
       authorization:
-        "https://accounts.spotify.com/authorize?scope=user-read-email,playlist-read-private,playlist-read-collaborative,playlist-modify-private,playlist-modify-public&redirect_uri=https://upbeatai.vercel.app/api/auth/callback/spotify",
+        "https://accounts.spotify.com/authorize?scope=playlist-read-private,playlist-modify-private&redirect_uri=https://upbeatai.vercel.app/api/auth/callback/spotify",
       // accessTokenUrl: "https://accounts.spotify.com/api/token",
     }),
   ],

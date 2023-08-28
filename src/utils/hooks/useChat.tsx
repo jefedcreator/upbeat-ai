@@ -206,7 +206,7 @@ export const Upbeat = ({ children }: { children: ReactNode }) => {
         role: "system",
         content:
           // "You will be provided with a description of a person's feeling, and your task is to generate an array of songs that matches the feelings if positive or improves the person's feelings if negative. return your output in an array 'reccomendations'.",
-          "You are a music recommender engine. Users will tell you how they feel emotionally,or the genre of music they want to listen to, or the artiste they want to listen to. you will understand the user current preferences and you will simply and precisely just return a list of music that exactly suits the user preference. ask the user for clarity if you do not understand their preference",
+          "As a music recommender, Users will tell you what they want to listen to. you will understand the user preference and you will simply and precisely just return a list of music that exactly suits the user preference. ask the user for clarity if you do not understand",
       };
       const errorMessage: ChatCompletionRequestMessage = {
         role: "assistant",
