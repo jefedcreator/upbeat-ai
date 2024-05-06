@@ -1,5 +1,6 @@
 <h1>Upbeat AI</h1>
 Unleash personalized playlists based on your mood. Experience the fusion of ChatGPT and Spotify
+![upbeat](https://github.com/jefedcreator/upbeat-ai/assets/72661662/9baa0ebd-a673-4d7f-9ab2-0457276502fb)
 
 ## Table of Contents
 
